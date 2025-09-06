@@ -17,13 +17,19 @@ type Counter struct {
 	counter int
 }
 
-func (c *Counter) Inc(n int, wg *sync.WaitGroup) {
-
-	defer wg.Done()
+func (c *Counter) Inc() {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.counter++
+}
+
+func (c *Counter) Value() int {
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	return c.counter
 }
 
 func main() {
@@ -31,15 +37,21 @@ func main() {
 	var wg sync.WaitGroup
 	c := Counter{}
 
+	const numIterrations = 1000
+
 	start := time.Now()
 
-	for i := 0; i < 500; i++ {
+	for i := 0; i < numIterrations; i++ {
 		wg.Add(1)
-		go c.Inc(i, &wg)
+
+		go func() {
+			defer wg.Done()
+			c.Inc()
+		}()
 	}
 	wg.Wait()
 
-	fmt.Println(c.counter)
+	fmt.Println(c.Value())
 	elapsed := time.Since(start)
 	fmt.Println("Processed time, ", elapsed)
 }
