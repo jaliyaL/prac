@@ -7,7 +7,7 @@ import (
 
 func main() {
 
-	urlArray := []string{"https://gobyexample.com", "https://www.google.comm/", "https://edition.cnn.com/"}
+	urlArray := []string{"https://gobyexample.cmom", "https://www.google.comm/", "https://edition.cnn.com/"}
 
 	for _, value := range urlArray {
 		resp, err := http.Get(value)
