@@ -17,7 +17,11 @@ type Counter struct {
 	counter int
 }
 
-func (c *Counter) Inc() {
+func (c *Counter) Inc(n int) {
+
+	c.counter++
+	fmt.Println("func receive", n)
+	fmt.Println("counter", c.counter)
 
 }
 
@@ -26,14 +30,13 @@ func (c *Counter) Inc() {
 // }
 
 func main() {
-
-	var Counter int = 0
+	c := Counter{}
 
 	start := time.Now()
 	for i := 0; i < 1000; i++ {
-		Counter++
+		go c.Inc(i)
 	}
-	fmt.Println(Counter)
+	//fmt.Println(Counter)
 	elapsed := time.Since(start)
 	fmt.Println("Processed time, ", elapsed)
 }
