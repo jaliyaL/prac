@@ -36,5 +36,4 @@ func main() {
 	fmt.Println(Counter)
 	elapsed := time.Since(start)
 	fmt.Println("Processed time, ", elapsed)
-
 }
