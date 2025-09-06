@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 )
 
 func main() {
 
-	urlArray := []string{"https://gobyexample.cmom", "https://www.google.comm/", "https://edition.cnn.com/"}
+	urlArray := []string{"https://gobyexample.com", "https://www.google.com/", "https://edition.cnn.com/"}
 
+	start := time.Now()
 	for _, value := range urlArray {
 		resp, err := http.Get(value)
 		if err != nil {
@@ -25,4 +27,6 @@ func main() {
 		defer resp.Body.Close()
 		fmt.Println("Response from -", value, resp.Status)
 	}
+	elapsed := time.Since(start)
+	fmt.Println(elapsed)
 }
