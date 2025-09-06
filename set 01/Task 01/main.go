@@ -24,7 +24,6 @@ func (c *Counter) Inc(n int, wg *sync.WaitGroup) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.counter++
-
 }
 
 func main() {
