@@ -32,7 +32,7 @@ func main() {
 
 	const numIterrations = 1000
 
-	ch := make(chan int, numIterrations)
+	//ch := make(chan int, numIterrations)
 	start := time.Now()
 
 	for i := 0; i < numIterrations; i++ {
