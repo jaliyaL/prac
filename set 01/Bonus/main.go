@@ -20,13 +20,13 @@ Use sync.Mutex to lock the map while reading or writing.
 */
 
 type Cache struct {
-	mu   sync.Mutex
+	mu   sync.RWMutex
 	data map[string]int
 }
 
 func (c *Cache) setCache(name string, age int) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	c.data[name] = age
 }
 
@@ -44,7 +44,7 @@ func main() {
 	c.setCache("Raj", 10)
 	c.setCache("Raju", 180)
 
-	if age, ok := c.getCache("Rajj"); ok {
+	if age, ok := c.getCache("Raj"); ok {
 		fmt.Println(c.data)
 		fmt.Println(age)
 	} else {
