@@ -3,36 +3,48 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"time"
+	"sync"
 )
+
+/*
+Problem 2: Concurrent URL Fetcher (15 min)
+•	Write a function to fetch status codes for a list of URLs concurrently.
+•	Handle errors gracefully.
+•	Discuss alternatives like sync.WaitGroup and buffered channels.
+*/
 
 func main() {
 
-	urlArray := []string{"https://gobyexample.com", "https://www.google.com/", "https://edition.cnn.com/"}
+	urlArray := []string{
+		"https://gobyexample.com",
+		"https://www.google.com/",
+		"https://edition.cnn.comm/",
+	}
 
-	start := time.Now()
-	for _, value := range urlArray {
+	var wg sync.WaitGroup
+	ch := make(chan string, len(urlArray))
 
-		go func() {
-			resp, err := http.Get(value)
+	for _, url := range urlArray {
+		wg.Add(1)
+		go func(u string) {
+			defer wg.Done()
+			resp, err := http.Get(u)
 			if err != nil {
-				// defer func() {
-				// 	if r := recover(); r != nil {
-				// 		fmt.Println("recoverd from", r)
-				// 	}
-				// }()
-				fmt.Printf("An error occurred: %v\n", err)
-				// The program will continue from here.
-				fmt.Println("Program did not panic and will continue.")
-
+				fmt.Println("error: ", err)
+				return
 			}
 			defer resp.Body.Close()
-			fmt.Println("Response from -", value, resp.Status)
-		}()
-
+			ch <- fmt.Sprintf("Url : %s and Status : %s", u, resp.Status)
+		}(url)
 	}
-	elapsed := time.Since(start)
-	fmt.Println("elapsed time ", elapsed)
-	//time.Sleep(2 * time.Second)
+
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	for res := range ch {
+		fmt.Println("response is ", res)
+	}
 
 }
