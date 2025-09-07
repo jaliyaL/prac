@@ -33,6 +33,6 @@ func main() {
 	}
 	elapsed := time.Since(start)
 	fmt.Println("elapsed time ", elapsed)
-	time.Sleep(2 * time.Second)
+	//time.Sleep(2 * time.Second)
 
 }
