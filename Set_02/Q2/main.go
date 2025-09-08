@@ -1,39 +1,71 @@
 package main
 
 import (
-	"fmt"
-	"sync"
+	"encoding/json"
+	"io"
+	"net/http"
 )
 
 /*
-Problem 2: Implement a worker pool where multiple
-goroutines process tasks concurrently.
-*/
-func worker(workers int, jobs <-chan int, wg *sync.WaitGroup) {
+ simple sequential Go example that fetches a few batches from RandomUser.me
+ so you can test the logic before scaling up to 50,000 users.
+ https://randomuser.me/api/?results=5000&seed=myseed&page=1
+https://randomuser.me/api/?results=5000&seed=myseed&page=2
+...
+https://randomuser.me/api/?results=5000&seed=myseed&page=10
 
-	for j := range jobs {
-		defer wg.Done()
-		fmt.Printf("worker %d got Job %d\n ", workers, j)
-	}
+*/
+
+type RandomUserResponse struct {
+	Results []User `json:"results"`
+	Info    Info   `json:"info"`
+}
+
+type User struct {
+	Name    Name    `json:"name"`
+	Email   string  `json:"email"`
+	Login   Login   `json:"login"`
+	Phone   string  `json:"phone"`
+	Cell    string  `json:"cell"`
+	Nat     string  `json:"nat"`
+	Picture Picture `json:"picture"`
+}
+
+type Name struct {
+	First string `json:"first"`
+	Last  string `json:"last"`
+}
+
+type Login struct {
+	Username string `json:"username"`
+	UUID     string `json:"uuid"`
+}
+
+type Picture struct {
+	Large string `json:"large"`
+}
+
+type Info struct {
+	Seed    string `json:"seed"`
+	Results int    `json:"results"`
+	Page    int    `json:"page"`
 }
 
 func main() {
 
-	var wg sync.WaitGroup
-	const numJobs = 5
-	const numWorkers = 3
+	resp, err := http.Get("https://randomuser.me/api/?results=2&seed=myseed&page=1")
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
 
-	jobs := make(chan int, numJobs)
-
-	for w := 1; w <= numWorkers; w++ {
-		go worker(w, jobs, &wg)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
 	}
 
-	for j := 1; j <= numJobs; j++ {
-		wg.Add(1)
-		jobs <- j
-	}
-	close(jobs)
+	var data RandomUserResponse
+	err = json.Unmarshal(body, &data)
+	//fmt.Println(data.Results[0].Name.First)
 
-	wg.Wait()
 }
